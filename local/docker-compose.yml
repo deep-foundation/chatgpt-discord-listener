@@ -1,0 +1,13 @@
+version: '3.6'
+services:
+  chatgpt-discord-listener:
+    image: deepf/chatgpt-discord-listener:main
+    networks:
+      - deep
+    ports:
+      - 3020:3020
+    restart: always
+    environment: {}
+networks:
+  deep:
+    driver: bridge
