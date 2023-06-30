@@ -22,19 +22,7 @@ const makeDeepClient = (token: string) => {
   return deepClient;
 }
 
-app.use(express.json());
-
-app.get('/healthz', (req, res) => {
-  res.json({});
-});
-app.post('/init', (req, res) => {
-  res.json({});
-});
-
-const triggeredByLinkId = 380;
-const deep = makeDeepClient("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiYWRtaW4iXSwieC1oYXN1cmEtZGVmYXVsdC1yb2xlIjoiYWRtaW4iLCJ4LWhhc3VyYS11c2VyLWlkIjoiMzgwIn0sImlhdCI6MTY4NzI3OTEwN30.y7MlFDVVgbBtCoyW2Z5HS0lUN7Bw1nzDKqV6Tkfnm40")
-
-const startBot = async () => {
+const startBot = async (deep) => {
   const conversationTypeLinkId = await deep.id("@deep-foundation/chatgpt", "Conversation");
   const messageTypeLinkId = await deep.id("@deep-foundation/messaging", "Message");
   const authorTypeLinkId = await deep.id("@deep-foundation/messaging", "Author");
@@ -49,7 +37,7 @@ const startBot = async () => {
     const { data: [{ value: { value: npmToken = undefined } = {} } = {}] = [] } = await deep.select({
       up: {
         tree_id: { _eq: containTreeId },
-        parent: { id: { _eq: triggeredByLinkId } },
+        parent_id: { _eq: deep.linkId },
         link: { type_id: { _eq: tokenTypeId } }
       }
     });
@@ -199,7 +187,18 @@ const startBot = async () => {
   return await botListenPromise;
 }
 
-startBot();
+app.use(express.json());
+
+app.get('/healthz', (req, res) => {
+  res.json({});
+});
+
+app.post('/init', (req, res) => {
+  const { token } = request.body;
+  const deep = makeDeepClient(token);
+  startBot(deep);
+  response.send(request.body);
+});
 
 
 http.createServer({ maxHeaderSize: 10*1024*1024*1024 }, app).listen(process.env.PORT);
