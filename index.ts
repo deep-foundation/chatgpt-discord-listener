@@ -81,10 +81,7 @@ const startBot = async (deep) => {
           console.log("replyToMessageId:" + message.reference.messageID);
           const replyToMessage = await message.fetchReference();
           console.log("reply text:" + replyToMessage.content);
-          messageContent = `# quoted
-          ${replyToMessage.content} 
-          # message
-          ${message.content}`;
+          messageContent = `${replyToMessage.content}---${message.content}`;
         } else messageContent = message.content;
 
         const messageLink = {
