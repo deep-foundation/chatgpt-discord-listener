@@ -125,7 +125,7 @@ async ({ deep, require, data: { oldLink, newLink, triggeredByLinkId } }) => {
                       to_id
                     }
                   }`
-            })
+            });
   
             const lastMessageId = result?.data?.[0]?.link?.id || conversationLinkId;
   
